@@ -1,0 +1,46 @@
+    # Check horizontal axis
+    for c in range(DIM):
+        if board[row][c] == piece:
+            reverse = True
+            opp_col = c
+            break
+    if reverse == True:
+        if col < opp_col < DIM: # at Left hand side
+            for c in range(col, opp_col):
+                board[row][c] = piece
+        elif opp_col < c: # at Right hand side
+            for c in range(opp_col, col):
+                board[row][c] = piece
+        else: # Placeholder
+            pass
+    reverse = False
+    
+    # Check vertical axis
+    for r in range(DIM):
+        if board[r][col] == piece:
+            reverse = True
+            opp_row = r
+            break
+    if reverse == True:
+        if opp_row < row: # at Up
+            for r in range(opp_row, row):
+                board[r][col] = piece
+        elif row < opp_row < DIM: # at Down
+            for r in range(row, opp_row):
+                board[r][col] = piece            
+    reverse = False
+
+    # Check positively slope diagonal (going up to the right)
+    for r in range(DIM):
+        if board[r][col] == piece:
+            reverse = True
+            opp_row = r
+            break
+    if reverse == True:
+        if opp_row < row: # at Up
+            for r in range(opp_row, row):
+                board[r][col] = piece
+        elif row < opp_row < DIM: # at Down
+            for r in range(row, opp_row):
+                board[r][col] = piece            
+    reverse = False
