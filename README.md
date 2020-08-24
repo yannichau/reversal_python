@@ -1,5 +1,9 @@
 # Reversal
 
+I was watching a tutorial on creating connect4 on python recently, and I wondered whether I could do the same for reversal, one of my favourite board games. So that's what I did!
+
+## Functions
+
 Here's the list of functions for this reversal game:
 
 1. `create_board()`  
@@ -26,8 +30,15 @@ Boolean true if all entries on the board are non-zero (so basically the board is
 8. `def insert(row, col, piece)`  
 A function specifically designed for the jupyter workbook, which performs `drop_piece()` and `print_board()`. Note that the notebook does not actually perform verification steps such as `can_play()`, `is_vacant()`, `is_reversible()`.
 
-For a quick look on how to play, look at the `reversal_test.ipynb` jupyter notebook.
+## Quick Start
 
+For a quick look on how to play, have a look at the [jupyter notebook](reversal_test.ipynb).
+
+The actual game is programmed in [reversal.py](reversal.py). To run, type the following in your terminal:
+
+    python3 ./reversal.py
+
+Note that the `numpy` and `matplotlib` packages must be installed in order to run the game.
 
 ## Plans for the future
 
