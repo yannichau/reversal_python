@@ -1,0 +1,35 @@
+# Reversal
+
+Here's the list of functions for this reversal game:
+
+1. `create_board()`  
+Initialises an empty board (a numpy array) with 4 pieces in the centre.
+
+2. `can_play(board, piece)`  
+Determines whether or not the user can place a piece, by performing `is_reversible()` on all vacant spots on the board. (In some cases a player may be inhibited to do so since there is no available spot where a reversal can occur.)
+
+3. `is_vacant(board, row, col, piece)`  
+Determines whether a position on a board is empty.
+
+4. `is_reversible(board, row, col, piece)`  
+Determines whether or not placing a piece at the given location would lead to reversals.
+
+5. `drop_piece(board, row, col, piece)`  
+Performed after `is_reversible()`. The piece is placed at the specified location and performs all reversals required. Also returns an integer, which is the number of reversals.
+
+6. `print_board(board, flip_num)`  
+Prints the board (both actual terminal output and a 'heat map' for better visibility), the total number of pieces on the board, the number of pieces for each player, and the number of flips (reversals) performed.
+
+7. `def is_end_game(board)`  
+Boolean true if all entries on the board are non-zero (so basically the board is full).
+
+8. `def insert(row, col, piece)`  
+A function specifically designed for the jupyter workbook, which performs `drop_piece()` and `print_board()`. Note that the notebook does not actually perform verification steps such as `can_play()`, `is_vacant()`, `is_reversible()`.
+
+For a quick look on how to play, look at the `reversal_test.ipynb` jupyter notebook.
+
+
+## Plans for the future
+
+- To create an actual graphical user interface for this game.
+- Create an AI to play with me......? Perhaps a bit too far fetched for me right now, but gonna look into it.
