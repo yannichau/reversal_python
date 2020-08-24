@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pylab as plt
 
 # Global variables
 DIM = 8
@@ -240,11 +241,12 @@ def drop_piece(board, row, col, piece, flip_num):
                 break
             row_it = row_it + 1
         if reverse == True:
-            for c in range (opp_col, col):
-                board[opp_row][c] = piece
+            row_it = row+1
+            for c in range (col-1, opp_col, -1):
+                board[row_it][c] = piece
                 flip_num = flip_num+1
-                print("         reverse piece at row=", opp_row, ", col=",c)
-                opp_row = opp_row - 1
+                print("         reverse piece at row=", row_it, ", col=",c)
+                row_it = row_it + 1
         reverse = False
 
     # Reverse positive diagonal, right of chess:
@@ -261,11 +263,12 @@ def drop_piece(board, row, col, piece, flip_num):
                 break
             row_it = row_it - 1
         if reverse == True:
+            row_it = row-1
             for c in range (col+1, opp_col):
-                board[opp_row][c] = piece
+                board[row_it][c] = piece
                 flip_num = flip_num+1
-                print("         reverse piece at row=", opp_row, ", col=",c)
-                opp_row = opp_row - 1
+                print("         reverse piece at row=", row_it, ", col=",c)
+                row_it = row_it - 1
         reverse = False
 
     # Reverse negative diagonal, left of chess:
@@ -282,11 +285,12 @@ def drop_piece(board, row, col, piece, flip_num):
                 break
             row_it = row_it - 1
         if reverse == True:
-            for c in range (opp_col, col):
-                board[opp_row][c] = piece
+            row_it = row-1
+            for c in range (col-1, opp_col, -1):
+                board[row_it][c] = piece
                 flip_num = flip_num+1
-                print("         reverse piece at row=", opp_row, ", col=",c)
-                opp_row = opp_row + 1
+                print("         reverse piece at row=", row_it, ", col=",c)
+                row_it = row_it - 1
         reverse = False
 
     # Reverse negative diagonal, right of chess:
@@ -303,11 +307,12 @@ def drop_piece(board, row, col, piece, flip_num):
                 break
             row_it = row_it + 1
         if reverse == True:
+            row_it = row+1
             for c in range (col+1, opp_col):
-                board[opp_row][c] = piece
+                board[row_it][c] = piece
                 flip_num = flip_num+1
-                print("         reverse piece at row=", opp_row, ", col=",c)
-                opp_row = opp_row + 1
+                print("         reverse piece at row=", row_it, ", col=",c)
+                row_it = row_it + 1
         reverse = False
 
 # Function to check if location is vacant.
@@ -318,6 +323,8 @@ def is_vacant(board, row, col, piece):
 # Print board
 def print_board(board): # 
     print(board)
+    plt.imshow(board, cmap='hot', interpolation='nearest')
+    plt.show()
 
 # End game (True if all entries are false)
 def end_game(board):
