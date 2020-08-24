@@ -342,7 +342,7 @@ def print_board(board, flip_num): #
     print("\nPlayer 1 pieces =", p1_score)
     print("Player 2 pieces =", p2_score)
     print("Number of flipped pieces: ", flip_num)
-    print("Number of pieces on board: ", np.count_nonzero(board))
+    print("Total number of pieces on the board: ", np.count_nonzero(board))
     print(board)
     plt.imshow(board, cmap='hot', interpolation='nearest')
     plt.show()
