@@ -32,7 +32,7 @@ A function specifically designed for the jupyter workbook, which performs `drop_
 
 ## Quick Start
 
-For a quick look on how to play, have a look at the [jupyter notebook](reversal_test.ipynb).
+For a quick look on how to play, have a look at the [jupyter notebook](reversal_test.ipynb) or a [pdf version of the jupyter notebook](reversal_test.pdf).
 
 The actual game is programmed in [reversal.py](reversal.py). To run, type the following in your terminal:
 
