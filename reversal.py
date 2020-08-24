@@ -232,7 +232,7 @@ def drop_piece(board, row, col, piece, flip_num):
         print ("    check positive diagonal left", row, col)
         row_it = row+1
         for c in range(col-1, 0, -1):
-            if (row_it) >= DIM:
+            if (row_it) >= DIM or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
                 reverse = True
@@ -254,7 +254,7 @@ def drop_piece(board, row, col, piece, flip_num):
         print ("    check positive diagonal right", row, col)
         row_it = row-1
         for c in range(col+1, DIM):
-            if (row_it) < 0:
+            if (row_it) < 0 or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
                 reverse = True
@@ -276,7 +276,7 @@ def drop_piece(board, row, col, piece, flip_num):
         print ("    check negative diagonal left", row, col)
         row_it = row-1
         for c in range(col-1, 0, -1):
-            if (row_it) < 0:
+            if (row_it) < 0 or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
                 reverse = True
@@ -298,7 +298,7 @@ def drop_piece(board, row, col, piece, flip_num):
         print ("    check negative diagonal right", row, col)
         row_it = row+1
         for c in range(col+1, DIM):
-            if (row_it) >= DIM:
+            if (row_it) >= DIM or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
                 reverse = True
