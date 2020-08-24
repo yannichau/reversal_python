@@ -3,16 +3,15 @@ import matplotlib.pylab as plt
 
 # Global variables
 DIM = 8
-flip_num = 0
 
-###################### INITIALISE VARIABLES #############################################
+############################ INITIALISE VARIABLES #######################################
 game_over = False
 turn = 1
 error = False
 p1_score = 0
 p2_score = 0
 
-################################## FUNCTIONS #############################################
+##################################### FUNCTIONS ##########################################
 
 # Function to Initiate Board
 def create_board():
@@ -189,7 +188,7 @@ def drop_piece(board, row, col, piece):
                 opp_col = c
                 break
         if reverse == True:
-            for c in range(col, opp_col):
+            for c in range(col+1, opp_col):
                 board[row][c] = piece
                 flip_num = flip_num+1
                 # print("         reverse piece at row=", row, ", col=",c)
@@ -206,7 +205,7 @@ def drop_piece(board, row, col, piece):
                 opp_col = c
                 break
         if reverse == True:
-            for c in range(opp_col, col):
+            for c in range(col-1, opp_col, -1):
                 board[row][c] = piece
                 flip_num = flip_num+1
                 # print("         reverse piece at row=", row, ", col=",c)
@@ -223,7 +222,7 @@ def drop_piece(board, row, col, piece):
                 opp_row = r
                 break
         if reverse == True:
-            for r in range(opp_row, row):
+            for r in range(row-1, opp_row, -1):
                 board[r][col] = piece
                 flip_num = flip_num+1
                 # print("         reverse piece at row=", r, ", col=",col)
@@ -240,7 +239,7 @@ def drop_piece(board, row, col, piece):
                 opp_row = r
                 break
         if reverse == True:
-            for r in range(row, opp_row):
+            for r in range(row+1, opp_row):
                 board[r][col] = piece
                 flip_num = flip_num+1
                 # print("         reverse piece at row=", r, ", col=",col)
@@ -333,12 +332,14 @@ def drop_piece(board, row, col, piece):
                 # print("         reverse piece at row=", row_it, ", col=",c)
                 row_it = row_it + 1
         reverse = False
+    
+    return flip_num
 
 # Print board and scores
-def print_board(board): # 
+def print_board(board, flip_num): # 
     p1_score = np.count_nonzero(board==1)
     p2_score = np.count_nonzero(board==2)
-    print("\n Player 1 pieces =", p1_score)
+    print("\nPlayer 1 pieces =", p1_score)
     print("Player 2 pieces =", p2_score)
     print("Number of flipped pieces: ", flip_num)
     print("Number of pieces on board: ", np.count_nonzero(board))
@@ -354,13 +355,11 @@ def is_end_game(board):
                 return False
     return True
 
-    #also need to consider how to count the number of pieces by each player (to see who wins!)
-
 
 #################################### MAIN LOOP ###########################################
 
 board = create_board()
-print_board(board)
+print_board(board, 0)
 
 # While loop for entire game
 while not game_over:
@@ -375,7 +374,7 @@ while not game_over:
 
         # Check for valid location
         if is_vacant(board, u_row, u_col, turn) and is_reversible(board, u_row, u_col, turn):
-            drop_piece(board, u_row, u_col, turn)
+            flip_num = drop_piece(board, u_row, u_col, turn)
         else:
             error = True
             print("\n ERROR: Play again. \n")
@@ -392,7 +391,7 @@ while not game_over:
             game_over = True
 
         # Print board
-        print_board(board)
+        print_board(board, flip_num)
     else:
         print("Player ", turn, "cannot move.")
     
