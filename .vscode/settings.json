@@ -1,4 +1,9 @@
 {
     "python.pythonPath": "/usr/local/Caskroom/miniconda/base/bin/python",
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintArgs":[
+        "--extension-pkg-whitelist=pygame",
+        "--erros-only"
+  ]
 }

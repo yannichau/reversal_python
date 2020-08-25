@@ -32,15 +32,23 @@ A function specifically designed for the jupyter workbook, which performs `drop_
 
 ## Quick Start
 
-For a quick look on how to play, have a look at the [jupyter notebook](reversal_test.ipynb) or a [pdf version of the jupyter notebook](reversal_test.pdf).
+For a quick look on how to play with the command line version, have a look at the [jupyter notebook](reversal_test.ipynb) or a [pdf version of the jupyter notebook](reversal_test.pdf).
 
-The actual game is programmed in [reversal.py](reversal.py). To run, type the following in your terminal:
+The actual game is programmed in [reversal.py](reversal.py). To run the command line version, type the following in your terminal:
 
     python3 ./reversal.py
 
-Note that the `numpy` and `matplotlib` packages must be installed in order to run the game.
+To run the GUI version, run:
+
+    python3 ./reversal_gui.py
+
+Note that the `numpy` and `matplotlib` packages must be installed in order to run the game. The `pygame` package must be installed for the GUI version as well.
+
+Here's a quick screenshot of the game.
+
+![screenshot_of_game](reversal_screenshot.png)
 
 ## Plans for the future
 
-- To create an actual graphical user interface for this game.
-- Create an AI to play with me......? Perhaps a bit too far fetched for me right now, but gonna look into it.
+- To create a more beautiful graphical user interface for this game.
+- Create an AI to play with me......? Perhaps a bit too far fetched for me right now, but gonna look into it. Maybe I can utilise deep learning (wow) or perhaps the relatively straightforward minimax algorithm.

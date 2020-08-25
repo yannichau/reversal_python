@@ -3,7 +3,11 @@ import matplotlib.pylab as plt
 import pygame
 import sys
 import math
-from tkinter import messagebox
+
+try:
+    from tkinter import messagebox
+except ImportError:
+    from Tkinter import messagebox
 
 # Global variables
 DIM = 8
