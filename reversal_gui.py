@@ -414,8 +414,6 @@ while not game_over:
     else:
         player_label = myfont.render(("Player 1"), 1, YELLOW)
     screen.blit(player_label, (20,SQUARE_SIZE/2)) #only updates specific part of screen
-    stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
-    screen.blit(stats_label, (width-500,SQUARE_SIZE/2))
     draw_board(board)
 
     # Main game
@@ -437,7 +435,7 @@ while not game_over:
                 u_row = int(math.floor(pos_y/SQUARE_SIZE))-1
                 u_col = int(math.floor(pos_x/SQUARE_SIZE))
 
-                # Check for valid location
+                # Check for valid location and drop piece
                 if is_vacant(board, u_row, u_col, turn) and is_reversible(board, u_row, u_col, turn):
                     flip_num = drop_piece(board, u_row, u_col, turn)
                 else:
@@ -459,7 +457,10 @@ while not game_over:
                     game_over = True
 
                 # Print board
-                
+                p1_score = np.count_nonzero(board==1)
+                p2_score = np.count_nonzero(board==2)
+                stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
+                screen.blit(stats_label, (width-600,SQUARE_SIZE/2))
                 print_board(board, flip_num)
                 draw_board(board)
             else:
