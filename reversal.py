@@ -3,7 +3,6 @@ import matplotlib.pylab as plt
 
 # Global variables
 DIM = 8
-flip_num = 0
 
 ###################### INITIALISE VARIABLES #############################################
 game_over = False
@@ -333,9 +332,11 @@ def drop_piece(board, row, col, piece):
                 # print("         reverse piece at row=", row_it, ", col=",c)
                 row_it = row_it + 1
         reverse = False
+    
+    return flip_num
 
 # Print board and scores
-def print_board(board): # 
+def print_board(board, flip_num): # 
     p1_score = np.count_nonzero(board==1)
     p2_score = np.count_nonzero(board==2)
     print("\n Player 1 pieces =", p1_score)
@@ -360,7 +361,7 @@ def is_end_game(board):
 #################################### MAIN LOOP ###########################################
 
 board = create_board()
-print_board(board)
+print_board(board, 0)
 
 # While loop for entire game
 while not game_over:
@@ -375,7 +376,7 @@ while not game_over:
 
         # Check for valid location
         if is_vacant(board, u_row, u_col, turn) and is_reversible(board, u_row, u_col, turn):
-            drop_piece(board, u_row, u_col, turn)
+            flip_num = drop_piece(board, u_row, u_col, turn)
         else:
             error = True
             print("\n ERROR: Play again. \n")
@@ -392,7 +393,7 @@ while not game_over:
             game_over = True
 
         # Print board
-        print_board(board)
+        print_board(board, flip_num)
     else:
         print("Player ", turn, "cannot move.")
     
