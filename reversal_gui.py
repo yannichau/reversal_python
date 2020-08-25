@@ -1,15 +1,37 @@
 import numpy as np
 import matplotlib.pylab as plt
+import pygame
+import sys
+import math
+from tkinter import messagebox
 
 # Global variables
 DIM = 8
 
+# Colors
+BLUE = (0,0,255)
+BLACK = (0,0,0)
+RED = (255,0,0)
+YELLOW = (255, 255, 0)
+WHITE = (255, 255, 255)
+
+# Screen Rendering Dimensions
+SQUARE_SIZE = 100
+RADIUS = int(SQUARE_SIZE/2 - 5)
+width = DIM * SQUARE_SIZE
+height = (DIM+1) * SQUARE_SIZE # additional empty row above
+size = (width, height) #tuple
+
 ############################ INITIALISE VARIABLES #######################################
 game_over = False
 turn = 1
+next_turn = 2
 error = False
 p1_score = 0
 p2_score = 0
+flip_num = 0
+temp_pos_x = 0
+temp_pos_y = 0
 
 ##################################### FUNCTIONS ##########################################
 
@@ -344,8 +366,8 @@ def print_board(board, flip_num): #
     print("Number of flipped pieces: ", flip_num)
     print("Total number of pieces on the board: ", np.count_nonzero(board))
     print(board)
-    plt.imshow(board, cmap='hot', interpolation='nearest')
-    plt.show()
+    # plt.imshow(board, cmap='hot', interpolation='nearest')
+    # plt.show()
 
 # End game (True if all entries are filled in)
 def is_end_game(board):
@@ -355,11 +377,30 @@ def is_end_game(board):
                 return False
     return True
 
+# Draw Board (Graphics)
+def draw_board(board):
+    # Draw background
+    for c in range(DIM):
+        for r in range(DIM):
+            pygame.draw.rect(screen, BLUE, (c*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 1)
+            if board[r][c] == 1: # Player 1
+                pygame.draw.circle(screen, YELLOW, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
+            elif board[r][c] == 2: # Player 2
+                pygame.draw.circle(screen, RED, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
+            else:
+                pass
+    pygame.display.update() 
 
 #################################### MAIN LOOP ###########################################
 
 board = create_board()
 print_board(board, 0)
+
+#pygame variables
+pygame.init()
+screen = pygame.display.set_mode(size)
+draw_board(board)
+myfont = pygame.font.SysFont("calibri",40)
 
 # While loop for entire game
 while not game_over:
@@ -367,37 +408,68 @@ while not game_over:
     # Reinitialise Flags
     error = False
 
-    if can_play(board, turn):
-        # Ask for Player input
-        u_row = int(input(("Player ", turn, " row: ")))
-        u_col = int(input(("Player ", turn, " column: ")))
-
-        # Check for valid location
-        if is_vacant(board, u_row, u_col, turn) and is_reversible(board, u_row, u_col, turn):
-            flip_num = drop_piece(board, u_row, u_col, turn)
-        else:
-            error = True
-            print("\n ERROR: Play again. \n")
-
-        # Check for end game
-        if is_end_game(board):
-            print("End Game. Who wins?")
-            if (p2_score > p1_score):
-                print("Player 1 wins!")
-            elif (p2_score == p1_score):
-                print("It's a tie! You're both winners/ losers!")
-            else:
-                print("Player 2 wins!")
-            game_over = True
-
-        # Print board
-        print_board(board, flip_num)
+    # Blit Statistics
+    if turn == 2:
+        player_label = myfont.render(("Player 2"), 1, RED)
     else:
-        print("Player ", turn, "cannot move.")
-    
-    # Next Player
-    if error == False:
-        if turn == 1:
-            turn = 2
-        else:
-            turn = 1
+        player_label = myfont.render(("Player 1"), 1, YELLOW)
+    screen.blit(player_label, (20,SQUARE_SIZE/2)) #only updates specific part of screen
+    stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
+    screen.blit(stats_label, (width-500,SQUARE_SIZE/2))
+    draw_board(board)
+
+    # Main game
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            print("turn =", turn)
+
+            pygame.draw.rect(screen, BLACK, (0,0,width, SQUARE_SIZE))
+
+            pos_x = event.pos[0] # Zeroeth element is horizontal axis, first element is vertical axis
+            pos_y = event.pos[1]
+
+            if can_play(board, turn):
+                # Ask for Player input
+                u_row = int(math.floor(pos_y/SQUARE_SIZE))-1
+                u_col = int(math.floor(pos_x/SQUARE_SIZE))
+
+                # Check for valid location
+                if is_vacant(board, u_row, u_col, turn) and is_reversible(board, u_row, u_col, turn):
+                    flip_num = drop_piece(board, u_row, u_col, turn)
+                else:
+                    error = True
+                    messagebox.showerror("Error", f"Position not valid. Player {turn} go again." % locals())
+
+                # Check for end game
+                if is_end_game(board):
+                    print("End Game. Who wins?")
+                    if (p2_score > p1_score):
+                        print("Player 1 wins!")
+                        messagebox.showinfo("Congrats!", "Player 1 won!")
+                    elif (p2_score == p1_score):
+                        print("It's a tie! You're both winners/ losers!")
+                        messagebox.showinfo("Lol!", "It's a tie!")
+                    else:
+                        print("Player 2 wins!")
+                        messagebox.showinfo("Congrats!", "Player 2 won!")
+                    game_over = True
+
+                # Print board
+                
+                print_board(board, flip_num)
+                draw_board(board)
+            else:
+                messagebox.showerror("Can't Move!", f"Player {turn} cannot move. It is {next_turn}'s turn." % locals())
+           
+            # Next Player
+            if error == False:
+                if turn == 1:
+                    turn = 2
+                    next_turn =1
+                else:
+                    turn = 1
+                    next_turn =2
