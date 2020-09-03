@@ -64,6 +64,8 @@ This function has 2 functions:
 1. With the drop boolean set to false, it determines whether the placement of piece will lead to reversals.
 2. With the drop boolean set to true, it actually drops the piece, and reverse the relevant pieces surounding it.
     This involves finding nearest piece (with opponent in between) in the vert/horz/diag axis and reversing the pieces.
+Remember that the upper range (even if the range is in reverse direction - large to small) is non-inclusive.
+    So for a bound from col x to 0, it should be [x, -1, -1]
 '''
 def orthello(board, row, col, piece, drop):
     flip_num = 0
@@ -105,7 +107,7 @@ def orthello(board, row, col, piece, drop):
     # Reverse left (must check from right to left):
     if (col-1) >= 0:
         print ("    check left", row, col)
-        for c in range(col-1, 0, -1):
+        for c in range(col-1, -1, -1):
             if board[row][c] == 0:
                 break
             if board[row][c] == piece:
@@ -126,7 +128,7 @@ def orthello(board, row, col, piece, drop):
     # Reverse up (must check from down to up):
     if (row-1) >= 0:
         print ("    check up", row, col)
-        for r in range(row-1, 0, -1):
+        for r in range(row-1, -1, -1):
             if board[r][col] == 0:
                 break
             if board[r][col] == piece:
@@ -145,7 +147,7 @@ def orthello(board, row, col, piece, drop):
         reverse = False
 
     # Reverse down:
-    if (row-1) <= DIM:
+    if (row+1) <= DIM: # amended
         print ("    check down", row, col)
         for r in range(row+1, DIM):
             if board[r][col] == 0:
@@ -155,9 +157,9 @@ def orthello(board, row, col, piece, drop):
                     break
                 if drop == False: 
                     return True
-            reverse = True
-            opp_row = r
-            break
+                reverse = True
+                opp_row = r
+                break
         if reverse == True and drop == True:
             for r in range(row+1, opp_row):
                 board[r][col] = piece
@@ -169,7 +171,7 @@ def orthello(board, row, col, piece, drop):
     if (col-1) >= 0:
         print ("    check positive diagonal left", row, col)
         row_it = row+1
-        for c in range(col-1, 0, -1):
+        for c in range(col-1, -1, -1):
             if row_it >= DIM or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
@@ -221,7 +223,7 @@ def orthello(board, row, col, piece, drop):
     if (col-1) >= 0:
         print ("    check negative diagonal left", row, col)
         row_it = row-1
-        for c in range(col-1, 0, -1):
+        for c in range(col-1, -1, -1):
             if (row_it) < 0 or board[row_it][c] == 0:
                 break
             if board[row_it][c] == piece:
@@ -312,7 +314,7 @@ def draw_board(board):
 def print_special_message(message):
     print(message)
     label = myfont.render(message, 1, WHITE)
-    screen.blit(label, (20,SQUARE_SIZE/5)) #only updates specific part of screen
+    screen.blit(label, (20,SQUARE_SIZE/6)) #only updates specific part of screen
     pygame.display.update()
     pygame.time.wait(1500)
 
@@ -385,7 +387,7 @@ while not game_over:
                     game_over = True
 
             else:
-                print_special_message((f"Can't Move! Player {turn} cannot move. It is {next_turn}'s turn." % locals()))
+                print_special_message((f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
            
             # Print and draw board.
             print_board(board, flip_num)
