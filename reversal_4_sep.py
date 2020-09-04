@@ -29,6 +29,8 @@ error = False
 p1_score = 0
 p2_score = 0
 flip_num = 0
+move = 1
+prev_move = 0
 playable_list = []
 
 ##################################### FUNCTIONS ##########################################
@@ -64,10 +66,10 @@ def can_play(board, piece):
 # Function to return a list of available locations.
 def availoc(board, available_board, piece):
     playable_locs = []
+    # available_board = np.zeros((DIM,DIM))
     # print("Return a list of playable locations.")
     for r in range(DIM):
         for c in range(DIM):
-            available_board[r][c] = 0
             if is_vacant(board, r, c, piece):
                 if orthello(board, r, c, piece, False):
                     playable_locs.append((r,c))
@@ -362,6 +364,7 @@ def next_turn(turn, error):
     pass
 
 #################################### INITIALISE VARIABLES ###########################################
+
 board = create_board()
 available_board = create_avaiBoard()
 playable_list = availoc(board, available_board, 1)
@@ -387,22 +390,13 @@ p1_score = np.count_nonzero(board==1)
 p2_score = np.count_nonzero(board==2)
 stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
 screen.blit(stats_label, (width-600, int(SQUARE_SIZE/2)))
-pygame.display.update()
 
-# Reiniialise variables?
-turn = 1
-next_turn = 2
-playable_list = availoc(board, available_board, turn)
+pygame.display.update()
 
 #################################### MAIN LOOP ###########################################
 while not game_over:
 
-    # Blit player and statistics information
-    if turn == 2:
-        player_label = myfont.render(("Player 2"), 1, RED)
-    else:
-        player_label = myfont.render(("Player 1"), 1, YELLOW)
-    screen.blit(player_label, (20, int(SQUARE_SIZE/2))) #only updates specific part of screen
+    # Blit statistics
     p1_score = np.count_nonzero(board==1)
     p2_score = np.count_nonzero(board==2)
     stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
@@ -411,6 +405,8 @@ while not game_over:
 
     # Reinitialise Flags
     error = False
+
+    playable_list = availoc(board, available_board, turn)
 
     if len(playable_list) != 0:
         # Main game
@@ -434,15 +430,12 @@ while not game_over:
                 # Check for valid location and drop piece
                 if is_vacant(board, u_row, u_col, turn) and orthello(board, u_row, u_col, turn, False):
                     flip_num = orthello(board, u_row, u_col, turn, True)
-                    playable_list = availoc(board, available_board, next_turn)
-                    draw_avaiBoard(available_board, next_turn)
                 else:
                     error = True
                     print_special_message((f"Error. Position not valid. Player {turn} go again." % locals()))
-                    playable_list = availoc(board, available_board, turn)
-                    draw_avaiBoard(available_board, turn)
                 
-                # Print and draw board.                     
+                # Print and draw board.
+                draw_avaiBoard(available_board, next_turn)
                 print_board(board, flip_num)
                 draw_board(board)
 
@@ -456,6 +449,14 @@ while not game_over:
                     else:
                         print_special_message("Player 2 wins!")
                     game_over = True
+                
+                # Blit player
+                if next_turn == 2:
+                    player_label = myfont.render(("Player 2"), 1, RED)
+                else:
+                    player_label = myfont.render(("Player 1"), 1, YELLOW)
+                screen.blit(player_label, (20, int(SQUARE_SIZE/2))) #only updates specific part of screen
+                pygame.display.update()
             
                 # Next move
                 if error == False:

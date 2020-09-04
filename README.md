@@ -40,13 +40,31 @@ The actual game is programmed in [reversal.py](reversal.py). To run the command 
 
 To run the GUI version, run:
 
-    python3 ./reversal_gui.py
-
-Note that the `numpy` and `matplotlib` packages must be installed in order to run the game. The `pygame` package must be installed for the GUI version as well.
+     python3 ./reversal_gui_mac.py
 
 Here's a quick screenshot of the game.
 
-![screenshot_of_game](reversal_screenshot.png)
+![screenshot_of_game](reversal_available_moves.png) 
+
+As you can see, the interface displays the locations available for the player as well.
+
+![error_message_of_game](reversal_error_message.png)
+
+In addition, special messages are displayed when appropriate. The special messages available are:
+
+- "Error. Position not valid. Player {turn} go again."
+- "Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn."
+- "Player {turn} wins!"
+
+### Packages required
+
+| Package \ Game version | [reversal.py (Command line version)](reversal.py) | [Jupyter Notebook](reversal_test.ipynb) | [reversal_gui_mac.py (GUI Version) ](reversal_gui_mac.py) |
+|------------------------|---------------------------------|----------------------------------------------|-------------------------------------------------|
+| `numpy`                | Y                               | Y                                            | Y                                               |
+| `matplotlib`           | Y                               | Y                                            | Y                                               |
+| `pygame`               |                                 |                                              | Y                                               |
+
+This assumes that you have python3 installed (as well as jupyter notebook installed if you would like to run the notebook).
 
 ## Plans for the future
 
