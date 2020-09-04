@@ -392,6 +392,7 @@ pygame.display.update()
 # Reiniialise variables?
 turn = 1
 next_turn = 2
+error = False
 playable_list = availoc(board, available_board, turn)
 
 #################################### MAIN LOOP ###########################################
