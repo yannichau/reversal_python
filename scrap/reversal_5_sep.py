@@ -16,25 +16,13 @@ YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 GREEN = (36, 173, 66)
 BROWN = (198, 135, 17)
-GRAY = (128, 128, 128)
 
 # Screen Rendering Dimensions
 SQUARE_SIZE = 100
 RADIUS = int(SQUARE_SIZE/2 - 5)
-width = (DIM+6) * SQUARE_SIZE
-height = (DIM+2) * SQUARE_SIZE # additional empty row above
+width = DIM * SQUARE_SIZE
+height = (DIM+1) * SQUARE_SIZE # additional empty row above
 size = (width, height) #tuple
-
-# Player and Statistics Locations
-stats_box_top_left = ((DIM+2)*SQUARE_SIZE, SQUARE_SIZE)
-player_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*1.5)
-stats_box_width = SQUARE_SIZE*3
-stats_box_height = SQUARE_SIZE*DIM
-stats_box_dim = (stats_box_width, stats_box_height)
-stats_line1_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*3)
-stats_line2_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*3.5)
-stats_line3_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4)
-stats_line4_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4.5)
 
 ################################## TEMPORARY VARIABLES #####################################
 game_over = False
@@ -45,7 +33,6 @@ p1_score = 0
 p2_score = 0
 flip_num = 0
 playable_list = []
-on_move = False
 wood_img = pygame.image.load('light_wood.jpg')
 
 ##################################### FUNCTIONS ##########################################
@@ -341,64 +328,38 @@ def draw_board(board):
     # Draw background
     for c in range(DIM):
         for r in range(DIM):
-            pygame.draw.rect(screen, BLACK, ((c+1)*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 1)
+            pygame.draw.rect(screen, BLACK, (c*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 1)
             if board[r][c] == 1: # Player 1
-                pygame.draw.circle(screen, WHITE, (int((c+1)*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
-                pygame.draw.circle(screen, BLACK, (int((c+1)*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
+                pygame.draw.circle(screen, WHITE, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
+                pygame.draw.circle(screen, BLACK, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
             elif board[r][c] == 2: # Player 2
-                pygame.draw.circle(screen, BLACK, (int((c+1)*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
+                pygame.draw.circle(screen, BLACK, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS)
             else:
                 pass
     pygame.display.update()
 
 def draw_avaiBoard(available_board, turn):
     # Draw background
-    print(available_board)
+    # print(available_board)
     screen.blit(wood_img, (0,0))
     for c in range(DIM):
         for r in range(DIM):
-            pygame.draw.rect(screen, GREEN, ((c+1)*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-            pygame.draw.rect(screen, BLACK, ((c+1)*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 1)
+            pygame.draw.rect(screen, GREEN, (c*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+            pygame.draw.rect(screen, BLACK, (c*SQUARE_SIZE, (r+1)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), 1)
             if available_board[r][c] == 1 and turn == 1: # Available moves for player 1
-                pygame.draw.circle(screen, WHITE, (int((c+1)*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
+                pygame.draw.circle(screen, WHITE, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
             elif available_board[r][c] == 2 and turn == 2: # Available moves for player 2
-                pygame.draw.circle(screen, BLACK, (int((c+1)*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
+                pygame.draw.circle(screen, BLACK, (int(c*SQUARE_SIZE+SQUARE_SIZE/2), int((r+1)*SQUARE_SIZE+SQUARE_SIZE/2)), RADIUS, 2)
             else:
                 pass
     available_board = np.zeros((DIM,DIM))
     pygame.display.update()
 
-# Blit player and statistics information
-def print_statistics(board, turn):
-    # print("blit player information")
-    # print("turn", turn)
-    pygame.draw.rect(screen, GRAY, (stats_box_top_left, stats_box_dim))
-    pygame.draw.rect(screen, BLACK, (stats_box_top_left, stats_box_dim), 1)
-    if turn == 2:
-        player_label = myfont.render(("Player 2"), 1, BLACK)
-    elif turn == 1:
-        player_label = myfont.render(("Player 1"), 1, WHITE)
-    screen.blit(player_label, player_centre)
-    p1_score = np.count_nonzero(board==1)
-    p2_score = np.count_nonzero(board==2)
-    total_label = myfont.render((f"Total = {np.count_nonzero(board)}"), 1, WHITE)
-    score1_label = myfont.render((f"P1 = {p1_score}"), 1, WHITE)
-    score2_label = myfont.render((f"P2 = {p2_score}"), 1, BLACK)
-    flip_label = myfont.render((f"Flipped = {flip_num}"), 1, WHITE)
-    screen.blit(total_label, stats_line1_centre)
-    screen.blit(score1_label, stats_line2_centre)
-    screen.blit(score2_label, stats_line3_centre)
-    screen.blit(flip_label, stats_line4_centre)
-    pygame.display.update()
-
 # Blit special error messages or win game messages on the top.
-def print_special_message(board, available_board, turn, message):
+def print_special_message(message):
     print(message)
     label = myfont.render(message, 1, WHITE)
-    screen.blit(wood_img, (0,0))
-    # draw_avaiBoard(available_board, turn)
-    # draw_board(board)
-    screen.blit(label, (20,500))
+    screen.blit(label, (20,int(SQUARE_SIZE/6))) #only updates specific part of screen
     pygame.display.update()
     pygame.time.wait(1500)
 
@@ -407,10 +368,10 @@ def next_turn(turn, next_turn, error):
     if error == False:
         if turn == 1:
             turn = 2
-            next_turn = 1
+            next_turn =1
         else:
             turn = 1
-            next_turn = 2
+            next_turn =2
 
 #################################### INITIALISE VARIABLES ###########################################
 board = create_board()
@@ -429,8 +390,18 @@ draw_avaiBoard(available_board, 1)
 draw_board(board)
 print_board(board, 0)
 
+# Blit player
+player_label = myfont.render(("Player 1"), 1, WHITE)
+screen.blit(player_label, (20, int(SQUARE_SIZE/2))) #only updates specific part of screen
+
+# Blit statistics
+p1_score = np.count_nonzero(board==1)
+p2_score = np.count_nonzero(board==2)
+stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
+screen.blit(stats_label, (width-600, int(SQUARE_SIZE/2)))
+pygame.display.update()
+
 # Reiniialise variables?
-on_move = False
 turn = 1
 next_turn = 2
 error = False
@@ -439,20 +410,27 @@ playable_list = availoc(board, available_board, turn)
 #################################### MAIN LOOP ###########################################
 while not game_over:
 
+    # Blit player and statistics information
+    if turn == 2:
+        player_label = myfont.render(("Player 2"), 1, BLACK)
+    else:
+        player_label = myfont.render(("Player 1"), 1, WHITE)
+    screen.blit(player_label, (20, int(SQUARE_SIZE/2))) #only updates specific part of screen
+    p1_score = np.count_nonzero(board==1)
+    p2_score = np.count_nonzero(board==2)
+    stats_label = myfont.render((f"Total={np.count_nonzero(board)}, P1={p1_score}, P2={p2_score}, Flipped={flip_num}"), 1, WHITE)
+    screen.blit(stats_label, (width-600, int(SQUARE_SIZE/2)))
+    pygame.display.update()
+
     # Reinitialise Flags
     error = False
-
-    print_statistics(board, turn)
-
     if len(playable_list) != 0:
-
         # Main game
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                on_move = False
 
                 print("turn =", turn)
                 pygame.draw.rect(screen, BLACK, (0,0,width, SQUARE_SIZE))
@@ -461,9 +439,9 @@ while not game_over:
                 pos_x = event.pos[0] # Zeroeth element is horizontal axis, first element is vertical axis
                 pos_y = event.pos[1]
 
-                if SQUARE_SIZE < pos_y < SQUARE_SIZE*(DIM+1)  and SQUARE_SIZE < pos_x < SQUARE_SIZE*(DIM+1) :          
+                if pos_y > SQUARE_SIZE:          
                     u_row = int(math.floor(pos_y/SQUARE_SIZE))-1
-                    u_col = int(math.floor(pos_x/SQUARE_SIZE))-1
+                    u_col = int(math.floor(pos_x/SQUARE_SIZE))
 
                     # Check for valid location and drop piece
                     if is_vacant(board, u_row, u_col, turn) and orthello(board, u_row, u_col, turn, False):
@@ -472,7 +450,7 @@ while not game_over:
                         draw_avaiBoard(available_board, next_turn)
                     else:
                         error = True
-                        print_special_message(board, available_board, turn,(f"Error. Position not valid. Player {turn} go again." % locals()))
+                        print_special_message((f"Error. Position not valid. Player {turn} go again." % locals()))
                         playable_list = availoc(board, available_board, turn)
                         draw_avaiBoard(available_board, turn)
                     
@@ -484,38 +462,35 @@ while not game_over:
                     if is_end_game(board):
                         print("End Game. Who wins?")
                         if (p2_score > p1_score):
-                            print_special_message(board, available_board, turn, "Player 2 wins!")
+                            print_special_message("Player 2 wins!")
                         elif (p2_score == p1_score):
-                            print_special_message(board, available_board, turn, "It's a tie! You're both winners/ losers!")
+                            print_special_message("It's a tie! You're both winners/ losers!")
                         else:
-                            print_special_message(board, available_board, turn, "Player 1 wins!")
+                            print_special_message("Player 1 wins!")
                         game_over = True
                 
-                    # Next move             
+                    # Next move
                     if error == False:
                         if turn == 1:
                             turn = 2
                             next_turn = 1
                         else:
                             turn = 1
-                            next_turn = 2 
+                            next_turn = 2
                 
                 else:
-                    print_special_message(board, available_board, turn, (f"Error. Position not valid. Player {turn} go again." % locals()))
+                    print_special_message((f"Error. Position not valid. Player {turn} go again." % locals()))
                     draw_avaiBoard(available_board, turn)
                     draw_board(board)
 
     else:
-        on_move = False
-        print_special_message(board, available_board, turn, (f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
-        draw_avaiBoard(available_board, turn)
-        draw_board(board)
+        print_special_message((f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
         playable_list = availoc(board, available_board, next_turn)
         if turn == 1:
             turn = 2
             next_turn = 1
         else:
             turn = 1
-            next_turn = 2
+            next_turn =2
 
 

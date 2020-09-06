@@ -1,4 +1,4 @@
-<h1>Reversal</h1>
+<h1>Reversal ⚪️⚫️</h1>
 
 - [1. Functions](#1-functions)
 - [2. Quick Start](#2-quick-start)
@@ -63,9 +63,11 @@ The actual game is programmed in [reversal.py](reversal.py). To run the command 
 
     python3 ./reversal.py
 
-The GUI version of the game is programmed in [reversal_gui_mac.py](reversal_gui_mac.py). To run the GUI version, run:
+Nevertheless, I have pretty much stopped updating the command line version ever since I started working on the GUI version. Arguably the most refined and bug-free version of the game is programmed in [reversal_gui_mac.py](reversal_gui_mac.py) which provides a neat easy-to-use GUI. To run the GUI version, run:
 
      python3 ./reversal_gui_mac.py
+
+Despite what the name of the file suggests, the game is designed to work on any platform. It's just that I originally used a packgage called `Tkinter` for displaying error messages in additional popup message-boxes. However, this didn't work so well when I was running the program on a Mac🍎, so I decided to display the messages in-game, within the pygame window itself.
 
 Here's a quick screenshot of the game. As you can see, the interface displays the locations available for the player as well.
 
@@ -95,3 +97,4 @@ This assumes that you have python3 installed (as well as jupyter notebook instal
 
 - To create a more beautiful graphical user interface for this game.
 - Create an AI to play with me......? Perhaps a bit too far fetched for me right now, but gonna look into it. Maybe I can utilise deep learning (wow) or perhaps the relatively straightforward minimax algorithm.
+- And of course, to fix any bugs that I find throughout the way.
