@@ -1,12 +1,16 @@
 import numpy as np
-import matplotlib.pylab as plt
+# import matplotlib.pylab as plt
 import pygame
 from pygame.locals import *
 import sys
 import math
+import random
 
 # Global variables
 DIM = 8
+PLAYER = 1
+AI = 2
+EMPTY = 0
 
 # Colors
 BLUE = (0,0,255)
@@ -37,15 +41,10 @@ stats_line3_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4)
 stats_line4_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4.5)
 
 ################################## TEMPORARY VARIABLES #####################################
-game_over = False
-turn = 1
-next_turn = 2
-error = False
 p1_score = 0
 p2_score = 0
 flip_num = 0
 playable_list = []
-on_move = False
 wood_img = pygame.image.load('media/light_wood.jpg')
 
 ##################################### FUNCTIONS ##########################################
@@ -59,13 +58,19 @@ def create_board():
     board[4][3] = 2
     return board
 
-# Initialise board of available playing locations, for player 1.
-def create_avaiBoard():
+# Initialise board of available playing locations, for either player.
+def create_avaiBoard(turn):
     available_board = np.zeros((DIM,DIM))
-    available_board[3][5] = 1
-    available_board[5][3] = 1
-    available_board[2][4] = 1
-    available_board[4][2] = 1
+    if turn == PLAYER:
+        available_board[3][5] = 1
+        available_board[5][3] = 1
+        available_board[2][4] = 1
+        available_board[4][2] = 1
+    elif turn == AI:
+        available_board[2][3] = 2
+        available_board[3][2] = 2
+        available_board[5][4] = 2
+        available_board[4][5] = 2        
     return available_board
 
 # Function to check if player can place piece.
@@ -111,7 +116,7 @@ def orthello(board, row, col, piece, drop):
 
     # Drop the piece
     if drop == True:
-        print("Drop piece and reverse")
+        print("Drop piece and reverse at row=", row, " col=", col)
         board[row][col] = piece
     else:
         pass
@@ -353,7 +358,7 @@ def draw_board(board):
 
 def draw_avaiBoard(available_board, turn):
     # Draw background
-    print(available_board)
+    # print(available_board)
     screen.blit(wood_img, (0,0))
     for c in range(DIM):
         for r in range(DIM):
@@ -414,8 +419,16 @@ def next_turn(turn, next_turn, error):
 
 #################################### INITIALISE VARIABLES ###########################################
 board = create_board()
-available_board = create_avaiBoard()
+turn = random.randint(PLAYER, AI)
+if turn == PLAYER:
+    next_turn = AI
+elif turn == AI:
+    next_turn = PLAYER
+available_board = create_avaiBoard(turn)
 playable_list = availoc(board, available_board, 1)
+
+player_valid = False
+AI_valid = False
 
 # pygame variables
 pygame.init()
@@ -430,92 +443,117 @@ draw_board(board)
 print_board(board, 0)
 
 # Reiniialise variables?
+game_over = False
 on_move = False
-turn = 1
-next_turn = 2
 error = False
 playable_list = availoc(board, available_board, turn)
 
 #################################### MAIN LOOP ###########################################
 while not game_over:
 
-    # Reinitialise Flags
+    # Reinitialise glags and print statistics to debug window
     error = False
-
     print_statistics(board, turn)
 
     if len(playable_list) != 0:
 
-        # Main game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
+        # PLAYER
+        if turn == PLAYER:
+            player_valid = False
+            for event in pygame.event.get():
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                on_move = False
+                if event.type == pygame.QUIT:
+                    sys.exit()
 
-                print("turn =", turn)
-                pygame.draw.rect(screen, BLACK, (0,0,width, SQUARE_SIZE))
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    on_move = False
+                    print("turn = PLAYER")
+                    pygame.draw.rect(screen, BLACK, (0,0,width, SQUARE_SIZE))
 
-                # Ask for Player input
-                pos_x = event.pos[0] # Zeroeth element is horizontal axis, first element is vertical axis
-                pos_y = event.pos[1]
+                    # Ask for Player input
+                    pos_x = event.pos[0] # Zeroeth element is horizontal axis, first element is vertical axis
+                    pos_y = event.pos[1]
 
-                if SQUARE_SIZE < pos_y < SQUARE_SIZE*(DIM+1)  and SQUARE_SIZE < pos_x < SQUARE_SIZE*(DIM+1) :          
-                    u_row = int(math.floor(pos_y/SQUARE_SIZE))-1
-                    u_col = int(math.floor(pos_x/SQUARE_SIZE))-1
+                    if SQUARE_SIZE < pos_y < SQUARE_SIZE*(DIM+1)  and SQUARE_SIZE < pos_x < SQUARE_SIZE*(DIM+1) :          
+                        u_row = int(math.floor(pos_y/SQUARE_SIZE))-1
+                        u_col = int(math.floor(pos_x/SQUARE_SIZE))-1
 
-                    # Check for valid location and drop piece
-                    if is_vacant(board, u_row, u_col, turn) and orthello(board, u_row, u_col, turn, False):
-                        flip_num = orthello(board, u_row, u_col, turn, True)
-                        playable_list = availoc(board, available_board, next_turn)
-                        draw_avaiBoard(available_board, next_turn)
-                    else:
-                        error = True
-                        print_special_message(board, available_board, turn,(f"Error. Position not valid. Player {turn} go again." % locals()))
-                        playable_list = availoc(board, available_board, turn)
-                        draw_avaiBoard(available_board, turn)
+                        # Check for valid location and drop piece
+                        if is_vacant(board, u_row, u_col, PLAYER) and orthello(board, u_row, u_col, PLAYER, False):
+                            player_valid = True
+                            flip_num = orthello(board, u_row, u_col, PLAYER, True)
+                            playable_list = availoc(board, available_board, next_turn)
+                            draw_avaiBoard(available_board, next_turn)
+                        else: # If the chosen location is on the board but not valid, PLAYER goes again.
+                            error = True
+                            print_special_message(board, available_board, turn,"Error. Position not valid. PLAYER go again.")
+                            playable_list = availoc(board, available_board, PLAYER)
+                            draw_avaiBoard(available_board, PLAYER)
+                        
+                        # Print and draw board.                     
+                        print_board(board, flip_num)
+                        draw_board(board)
                     
-                    # Print and draw board.                     
-                    print_board(board, flip_num)
-                    draw_board(board)
+                    else: # If the chosen location is off the board, PLAYER goes again (what the hell)
+                        print_special_message(board, available_board, turn, "Error. Position not valid. PLAYER go again.")
+                        draw_avaiBoard(available_board, PLAYER)
+                        draw_board(board)
+            
+        if turn == AI:
+            pygame.time.wait(2000)
+            AI_valid = False
+            print("turn = AI")
 
-                    # Check for end game
-                    if is_end_game(board):
-                        print("End Game. Who wins?")
-                        if (p2_score > p1_score):
-                            print_special_message(board, available_board, turn, "Player 2 wins!")
-                        elif (p2_score == p1_score):
-                            print_special_message(board, available_board, turn, "It's a tie! You're both winners/ losers!")
-                        else:
-                            print_special_message(board, available_board, turn, "Player 1 wins!")
-                        game_over = True
-                
-                    # Next move             
-                    if error == False:
-                        if turn == 1:
-                            turn = 2
-                            next_turn = 1
-                        else:
-                            turn = 1
-                            next_turn = 2 
-                
-                else:
-                    print_special_message(board, available_board, turn, (f"Error. Position not valid. Player {turn} go again." % locals()))
-                    draw_avaiBoard(available_board, turn)
-                    draw_board(board)
+            rand_row, rand_col = random.choice(playable_list)
 
-    else:
+            # Check for valid location and drop piece
+            if is_vacant(board, rand_row, rand_col, AI) and orthello(board, rand_row, rand_col, AI, False):
+                AI_valid = True
+                flip_num = orthello(board, rand_row, rand_col, AI, True)
+                playable_list = availoc(board, available_board, next_turn)
+                draw_avaiBoard(available_board, next_turn)
+            else: # If the chosen location is on the board but not valid, AI goes again.
+                error = True
+                print_special_message(board, available_board, turn,"Error. Position not valid. AI go again.")
+                playable_list = availoc(board, available_board, AI)
+                draw_avaiBoard(available_board, AI)
+            
+            # Print and draw board.                     
+            print_board(board, flip_num)
+            draw_board(board)
+
+        # Check for end game
+        if is_end_game(board):
+            print("End Game. Who wins?")
+            if (p2_score > p1_score):
+                print_special_message(board, available_board, turn, "AI wins!")
+            elif (p2_score == p1_score):
+                print_special_message(board, available_board, turn, "It's a tie! You're both winners/ losers!")
+            else:
+                print_special_message(board, available_board, turn, "PLAYER wins!")
+            game_over = True
+
+        # Next move
+        # If error = False             
+        if turn == PLAYER and player_valid == True:
+            turn = AI
+            next_turn = PLAYER
+        elif turn == AI and AI_valid == True:
+            turn = PLAYER
+            next_turn = AI
+        else:
+            pass
+
+    else: # If either player cannot move, then move on to next player. Blit available locations for next player.
         on_move = False
         print_special_message(board, available_board, turn, (f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
         draw_avaiBoard(available_board, turn)
         draw_board(board)
-        playable_list = availoc(board, available_board, next_turn)
-        if turn == 1:
-            turn = 2
-            next_turn = 1
+        if turn == PLAYER:
+            turn = AI
+            next_turn = PLAYER
         else:
-            turn = 1
-            next_turn = 2
-
+            turn = PLAYER
+            next_turn = AI
+        playable_list = availoc(board, available_board, turn)
 

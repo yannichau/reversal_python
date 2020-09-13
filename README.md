@@ -71,11 +71,11 @@ Despite what the name of the file suggests, the game is designed to work on any 
 
 Here's a quick screenshot of the game. As you can see, the interface displays the locations available for the player as well.
 
-![screenshot_of_game](reversal_available_moves.png) 
+![screenshot_of_game](media/reversal_available_moves.png) 
 
 ## 2.1. Error Messages
 
-![error_message_of_game](reversal_error_message.png)
+![error_message_of_game](media/reversal_error_message.png)
 
 In addition, special messages are displayed when appropriate. The special messages available are:
 
