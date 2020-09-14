@@ -8,9 +8,9 @@
 
 I was watching a tutorial on creating connect4 on python recently, and I wondered whether I could do the same for reversal/ orthello, one of my favourite board games. So that's what I did!
 
-# 1. Functions
+The game is being iteratively developed and updated, which means that the descriptions below only reflect the newest version of the program. For more information on the past iterations of the game, check out the [log](log.md).
 
-The functions are being iteratively updated throughout the development of the game. Hence, the descriptions below only reflect the newest version of theprogram.
+# 1. Functions
 
 Here's the list of functions for this game:
 
