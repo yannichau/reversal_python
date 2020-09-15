@@ -2,6 +2,7 @@
 
 - [Conventions](#conventions)
 - [Logs](#logs)
+  - [Sep 15, 2020 Somewhat decent AI](#sep-15-2020-somewhat-decent-ai)
   - [Sep 14, 2020 Created log](#sep-14-2020-created-log)
   - [Sep 13, 2020 Implement dumb AI](#sep-13-2020-implement-dumb-ai)
   - [Sep 6, 2020 Overhauled Interface](#sep-6-2020-overhauled-interface)
@@ -23,6 +24,26 @@ This is a log of the the development of my reversal/ orthello game. I created th
 - The board is represented by a numpy array of dimension 8x8. For instance, (3,4) refers to the location at the 4th row, in the 5th column.
 
 # Logs
+
+## Sep 15, 2020 Somewhat decent AI
+
+I have previously watched a tutorial on implementing AI for a connect4 game, which uses a decision rule called the "minimax algorithm" for determining the best move. There's quite a bit of math and game theory related stuff involved, but in short, it is based on a weighted score-based system such that it maximises the player's own gains and minimises its losses; this is iteratively applied to consecutive moves for both the player and its opponent. For more details, check out the [wikipedia page](https://en.wikipedia.org/wiki/Minimax) (check out the psuedocode as well!). I wondered how well this would be for reversi/ orthello, so without looking into other orthello projects, I went straight to implementation after watching the connect4 AI tutorial.
+
+I continued working in [reversal_ai.py](reversal_ai.py), where I created several new methods, including `score_position()`, `pick_best_move()` and `minimax()`. Here's a short description for each method:
+
+- `score_position()` assigns a score for the location specified. Unlike a connect4 game where you can immediately identify windows of 3/4 in a row, for orthello you can't really do that. Currently, I consider advantage points (borders and corners) as well as number of flipped pieces, though the flipped number plays a much smaller role that the aforementioned advantage points (it's just there to add a small offset). It also consider advantage points of the opponent in the next turn. I suspect this may be slightly messing the minimax algorithm.
+- `pick_best_move()` is a method that is no longer used. It is just used for testing `score-position()`, so it just selects the best location based on scores on the current board only.
+- `minimax()` is where I implement the minimax algorithm. It recursively calls itself, and calls on `score_position()` when the depth reaches zero. One thing is I don't consider the terminal nodes mentioned in the psuedocode - I'm not quite sure how winning moves applies to a game like Orthello.
+
+ > Random thought: maybe I should also consider the scenario where one's own position could be immediately reversed by the opponent.
+
+As of now, the AI isn't really super smart, but I would say that if I do make one dumb move, playing with the AI is quite hard.
+
+Other changes:
+
+- More bug fixes
+- Updated README for new interface and new functions.
+- Slight update to blitting of special messages.
 
 ## Sep 14, 2020 Created log
 

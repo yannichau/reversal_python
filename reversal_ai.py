@@ -380,15 +380,15 @@ def print_statistics(board, turn):
 	pygame.draw.rect(screen, GRAY, (stats_box_top_left, stats_box_dim))
 	pygame.draw.rect(screen, BLACK, (stats_box_top_left, stats_box_dim), 1)
 	if turn == 2:
-		player_label = myfont.render(("Player 2"), 1, BLACK)
+		player_label = myfont.render(("AI"), 1, BLACK)
 	elif turn == 1:
-		player_label = myfont.render(("Player 1"), 1, WHITE)
+		player_label = myfont.render(("PLAYER"), 1, WHITE)
 	screen.blit(player_label, player_centre)
 	p1_score = np.count_nonzero(board==1)
 	p2_score = np.count_nonzero(board==2)
 	total_label = myfont.render((f"Total = {np.count_nonzero(board)}"), 1, WHITE)
-	score1_label = myfont.render((f"P1 = {p1_score}"), 1, WHITE)
-	score2_label = myfont.render((f"P2 = {p2_score}"), 1, BLACK)
+	score1_label = myfont.render((f"PLAYER = {p1_score}"), 1, WHITE)
+	score2_label = myfont.render((f"AI = {p2_score}"), 1, BLACK)
 	flip_label = myfont.render((f"Flipped = {flip_num}"), 1, WHITE)
 	screen.blit(total_label, stats_line1_centre)
 	screen.blit(score1_label, stats_line2_centre)
@@ -405,7 +405,8 @@ def print_special_message(board, available_board, turn, message):
 	# draw_board(board)
 	screen.blit(label, (20,500))
 	pygame.display.update()
-	pygame.time.wait(1500)
+	print_statistics(board, turn)
+	pygame.time.wait(2500)
 
 # Goes to next turn.
 def next_turn(turn, next_turn, error):
@@ -425,24 +426,39 @@ def score_position(board, turn, flip_num):
 	if turn == PLAYER:
 			opp_turn = AI
 	
-	# Advantage points - borders; count for both myself and the opponent
+	# Own Advantage points - borders
 	left_array = [int(i) for i in list(board[:,0])]
 	right_array = [int(i) for i in list(board[:,DIM-1])]
 	top_array = [board[0][i] for i in range(1, DIM-1)] # excluding first and last locations
 	bott_array = [board[DIM-1][i] for i in range(1, DIM-1)] # excluding first and last locations
 	border_count = left_array.count(turn) + right_array.count(turn) + top_array.count(turn) + bott_array.count(turn)
-	border_count_opp = left_array.count(opp_turn) + right_array.count(opp_turn) + top_array.count(opp_turn) + bott_array.count(opp_turn)
-	score = score + border_count*20 - border_count_opp*35
+	# border_count_opp = left_array.count(opp_turn) + right_array.count(opp_turn) + top_array.count(opp_turn) + bott_array.count(opp_turn)
+	score = score + border_count*10 # - border_count_opp*35
 
-	# Advantage points - corners
+	# Own Advantage points - corners
 	corners = [board[0][0], board[0][DIM-1], board[DIM-1][0], board[DIM-1][DIM-1]]
 	corner_count = corners.count(turn)
-	corner_count_opp = corners.count(opp_turn)
-	score = score + corner_count*50 - corner_count_opp*100
+	# corner_count_opp = corners.count(opp_turn)
+	score = score + corner_count*100 # - corner_count_opp*100
 
-	# Number of flipped pieces
-	score += flip_num*2
-	
+	# Number of flipped pieces for the given move (just for a small offset)
+	score += flip_num
+
+	# Advantage points of opponent in next move
+	next_board = board.copy()
+	next_avaiboard = np.zeros((DIM,DIM))
+	next_availist = availoc(next_board, next_avaiboard, opp_turn)
+	next_corners = [next_avaiboard[0][0], next_avaiboard[0][DIM-1], next_avaiboard[DIM-1][0], next_avaiboard[DIM-1][DIM-1]]
+	next_corner_count = next_corners.count(opp_turn)
+	next_left_array = [int(i) for i in list(next_avaiboard[:,0])]
+	next_right_array = [int(i) for i in list(next_avaiboard[:,DIM-1])]
+	next_top_array = [next_avaiboard[0][i] for i in range(1, DIM-1)]
+	next_bott_array = [next_avaiboard[DIM-1][i] for i in range(1, DIM-1)]
+	next_border_count = next_left_array.count(opp_turn) + next_right_array.count(opp_turn) + next_top_array.count(opp_turn) + next_bott_array.count(opp_turn)
+	score = score - next_corner_count*200 - next_border_count*20
+
+	# Consider if own position is immediately flipped afterwards?
+
 	return score
 
 # Picks the best move based on the current board only.
@@ -462,21 +478,32 @@ def pick_best_move(board, available_board, turn):
 	return best_loc
 
 # Minimax Algorithm for finding the the best move
-def minimax(board, depth, alpha, beta, maximizingPlayer):
+def minimax(board, depth, alpha, beta, maximizingPlayer, new_row, new_col):
 	temp_avaiboard = np.zeros((DIM,DIM))
 	valid_locations = availoc(board, temp_avaiboard, turn)
-	best_row, best_col = random.choice(valid_locations)
+	print("turn = ", turn)
+	print("available_board = ", temp_avaiboard)
+	print("valid_locations = ", valid_locations)
 	temp_board = board.copy()
+	best_row, best_col = (0,0) # initalisation
+	if new_row == None:
+		if len(valid_locations) != 0:
+			best_row, best_col = random.choice(valid_locations)
+	else:
+		best_row, best_col = new_row, new_col
 	flip_num = orthello(temp_board, best_row, best_col, AI, True) 
-	if depth == 0: # not useful to know the terminal node of the game
+
+	if depth == 0 or len(valid_locations)== 0: # not useful to know the terminal node of the game
 		return (None, None, score_position(board, AI, flip_num))
+
 	if maximizingPlayer:
 		value = -math.inf
+		best_row, best_col = random.choice(valid_locations)
 		for loc in valid_locations:
 			row, col = loc
 			b_copy = board.copy()
 			dummy = orthello(b_copy, row, col, AI, True)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[2]
+			new_score = minimax(b_copy, depth-1, alpha, beta, False, row, col)[2]
 			if new_score > value:
 				value = new_score
 				best_row = row
@@ -485,13 +512,15 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
 			if alpha >= beta:
 				break
 		return best_row, best_col, value
+
 	else: # Minimizing player
 		value = math.inf
+		best_row, best_col = random.choice(valid_locations)
 		for loc in valid_locations:
 			row, col = loc
 			b_copy = board.copy()
 			dummy = orthello(b_copy, row, col, PLAYER, True)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[2]
+			new_score = minimax(b_copy, depth-1, alpha, beta, True, row, col)[2]
 			if new_score < value:
 				value = new_score
 				best_row = row
@@ -584,12 +613,13 @@ while not game_over:
 						draw_board(board)
 			
 		if turn == AI:
+			# pygame.time.wait(3000)
 			AI_valid = False
 			print("turn = AI")
 
 			# row, col = random.choice(playable_list)
 			# row, col = pick_best_move(board, available_board, turn)
-			row, col, minimax_score = minimax(board, 4, -math.inf, math.inf, True)
+			row, col, minimax_score = minimax(board, 4, -math.inf, math.inf, True, None, None)
 
 			# Check for valid location and drop piece
 			if is_vacant(board, row, col, AI) and orthello(board, row, col, AI, False):
