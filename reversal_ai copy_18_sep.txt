@@ -419,7 +419,7 @@ def next_turn(turn, next_turn, error):
 			next_turn = 2
 
 # Designate scores for positions available on the board (which is the temporary board where the test piece is inserted)
-def score_position(board, turn):
+def score_position(board, turn, flip_num):
 	score = 0
 
 	opp_turn = PLAYER
@@ -441,12 +441,10 @@ def score_position(board, turn):
 	# corner_count_opp = corners.count(opp_turn)
 	score = score + corner_count*100 # - corner_count_opp*100
 
-	return score
-
 	# Number of flipped pieces for the given move (just for a small offset)
-	# score += flip_num
+	score += flip_num
 
-""" 	# Advantage points of opponent in next move
+	# Advantage points of opponent in next move
 	next_board = board.copy()
 	next_avaiboard = np.zeros((DIM,DIM))
 	next_availist = availoc(next_board, next_avaiboard, opp_turn)
@@ -459,9 +457,9 @@ def score_position(board, turn):
 	next_border_count = next_left_array.count(opp_turn) + next_right_array.count(opp_turn) + next_top_array.count(opp_turn) + next_bott_array.count(opp_turn)
 	score = score - next_corner_count*200 - next_border_count*20
 
-	# Consider if own position is immediately flipped afterwards? """
+	# Consider if own position is immediately flipped afterwards?
 
-	
+	return score
 
 # Picks the best move based on the current board only.
 def pick_best_move(board, available_board, turn):
@@ -480,15 +478,23 @@ def pick_best_move(board, available_board, turn):
 	return best_loc
 
 # Minimax Algorithm for finding the the best move
-def minimax(board, depth, alpha, beta, maximizingPlayer):
+def minimax(board, depth, alpha, beta, maximizingPlayer, new_row, new_col):
 	temp_avaiboard = np.zeros((DIM,DIM))
 	valid_locations = availoc(board, temp_avaiboard, turn)
 	print("turn = ", turn)
 	print("available_board = ", temp_avaiboard)
 	print("valid_locations = ", valid_locations)
+	temp_board = board.copy()
+	best_row, best_col = (0,0) # initalisation
+	if new_row == None:
+		if len(valid_locations) != 0:
+			best_row, best_col = random.choice(valid_locations)
+	else:
+		best_row, best_col = new_row, new_col
+	flip_num = orthello(temp_board, best_row, best_col, AI, True) 
 
 	if depth == 0 or len(valid_locations)== 0: # not useful to know the terminal node of the game
-		return (None, None, score_position(board, AI))
+		return (None, None, score_position(board, AI, flip_num))
 
 	if maximizingPlayer:
 		value = -math.inf
@@ -497,7 +503,7 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
 			row, col = loc
 			b_copy = board.copy()
 			dummy = orthello(b_copy, row, col, AI, True)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[2]
+			new_score = minimax(b_copy, depth-1, alpha, beta, False, row, col)[2]
 			if new_score > value:
 				value = new_score
 				best_row = row
@@ -514,7 +520,7 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
 			row, col = loc
 			b_copy = board.copy()
 			dummy = orthello(b_copy, row, col, PLAYER, True)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[2]
+			new_score = minimax(b_copy, depth-1, alpha, beta, True, row, col)[2]
 			if new_score < value:
 				value = new_score
 				best_row = row
@@ -550,8 +556,8 @@ draw_board(board)
 print_board(board, 0)
 
 # Reiniialise variables?
-cant_move = 0
 game_over = False
+on_move = False
 error = False
 playable_list = availoc(board, available_board, turn)
 
@@ -563,7 +569,6 @@ while not game_over:
 	print_statistics(board, turn)
 
 	if len(playable_list) != 0:
-		cant_move = 0
 
 		# PLAYER
 		if turn == PLAYER:
@@ -574,6 +579,7 @@ while not game_over:
 					sys.exit()
 
 				if event.type == pygame.MOUSEBUTTONDOWN:
+					on_move = False
 					print("turn = PLAYER")
 					pygame.draw.rect(screen, BLACK, (0,0,width, SQUARE_SIZE))
 
@@ -613,7 +619,7 @@ while not game_over:
 
 			# row, col = random.choice(playable_list)
 			# row, col = pick_best_move(board, available_board, turn)
-			row, col, minimax_score = minimax(board, 4, -math.inf, math.inf, True)
+			row, col, minimax_score = minimax(board, 4, -math.inf, math.inf, True, None, None)
 
 			# Check for valid location and drop piece
 			if is_vacant(board, row, col, AI) and orthello(board, row, col, AI, False):
@@ -634,7 +640,7 @@ while not game_over:
 		# Check for end game
 		p1_score = np.count_nonzero(board==1)
 		p2_score = np.count_nonzero(board==2)
-		if is_end_game(board) or cant_move > 2:
+		if is_end_game(board):
 			print("End Game. Who wins?")
 			if (p2_score > p1_score):
 				print_special_message(board, available_board, turn, "AI wins!")
@@ -656,7 +662,7 @@ while not game_over:
 			pass
 
 	else: # If either player cannot move, then move on to next player. Blit available locations for next player.
-		cant_move += 1
+		on_move = False
 		print_special_message(board, available_board, turn, (f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
 		draw_avaiBoard(available_board, turn)
 		draw_board(board)
