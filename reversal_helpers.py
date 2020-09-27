@@ -51,8 +51,14 @@ Master class for this game!
 class Reversal:
 
     # Function to Initiate
-    # def create_boards():
-    def __init__(self, turn):
+    def __init__(self):
+        self.flip_num = 0
+        self.board = np.zeros((DIM, DIM))
+        self.available_board = np.zeros((DIM, DIM))
+
+
+    # Should be run at the start of the game.
+    def initialise(self, turn):
         pygame.init()
         self.screen = pygame.display.set_mode(size)
         self.myfont = pygame.font.SysFont("calibri", 30)
@@ -61,13 +67,10 @@ class Reversal:
             self.next_turn = AI
         else:
             self.next_turn = PLAYER
-        self.flip_num = 0
-        self.board = np.zeros((DIM, DIM))
         self.board[3][3] = 1
         self.board[4][4] = 1
         self.board[3][4] = 2
         self.board[4][3] = 2
-        self.available_board = np.zeros((DIM, DIM))
         if turn == PLAYER:
             self.available_board[3][5] = 1
             self.available_board[5][3] = 1
@@ -78,6 +81,7 @@ class Reversal:
             self.available_board[3][2] = 2
             self.available_board[5][4] = 2
             self.available_board[4][5] = 2  
+
 
     # Function to check if location is vacant.
     def is_vacant(self, row, col, piece):
@@ -453,13 +457,11 @@ class Reversal:
         # corner_count_opp = corners.count(opp_turn)
         score = score + corner_count*100 # - corner_count_opp*100
 
-        return score
-
         # Number of flipped pieces for the given move (just for a small offset)
         # score += flip_num
 
         # Advantage points of opponent in next move
-        next_board = Reversal(opp_turn)
+        next_board = Reversal()
         next_board.board = self.board.copy()
         next_availist = next_board.availoc(opp_turn)
         next_corners = [(0, 0), (0, DIM-1), (DIM-1, 0), (DIM-1, DIM-1)]
@@ -473,6 +475,8 @@ class Reversal:
 
         # Consider if own position is immediately flipped afterwards?
 
+        return score
+
     # Picks the best move based on the current board only.
     def pick_best_move(self, turn):
         best_score = -10000
@@ -480,7 +484,7 @@ class Reversal:
         best_row, best_col = random.choice(valid_locations) # initialise with random location.
         for loc in valid_locations:
             best_row, best_col = loc
-            temp = Reversal(turn)
+            temp = Reversal()
             temp.board = self.board.copy()
             temp.available_board = self.available_board.copy()
             flip_num = temp.orthello(best_row, best_col, turn, True) 

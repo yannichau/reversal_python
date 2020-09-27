@@ -4,7 +4,7 @@ import random
 # Minimax Algorithm for finding the the best move
 def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
 
-    temp = Reversal(turn)
+    temp = Reversal()
     temp.board = board.copy()
     valid_locations = temp.availoc(turn)
 
@@ -16,7 +16,7 @@ def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
         best_row, best_col = random.choice(valid_locations)
         for loc in valid_locations:
             row, col = loc
-            temp_new = Reversal(turn)
+            temp_new = Reversal()
             temp_new.board = temp.board.copy()
             dummy = temp_new.orthello(row, col, AI, True)
             new_score = minimax(temp_new.board, depth-1, alpha, beta, False, AI)[2]
@@ -34,7 +34,7 @@ def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
         best_row, best_col = random.choice(valid_locations)
         for loc in valid_locations:
             row, col = loc
-            temp_new = Reversal(turn)
+            temp_new = Reversal()
             temp_new.board = temp.board.copy()
             dummy = temp_new.orthello(row, col, PLAYER, True)
             new_score = minimax(temp_new.board, depth-1, alpha, beta, True, PLAYER)[2]
@@ -54,7 +54,8 @@ if turn == PLAYER:
 elif turn == AI:
     next_turn = PLAYER
 
-game = Reversal(turn)
+game = Reversal()
+game.initialise(turn)
 playable_list = game.availoc(turn)
 
 # First blit

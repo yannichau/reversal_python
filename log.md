@@ -41,6 +41,8 @@ Going forward, it is in my best interest to seperate my functions into a seperat
 
 One minor (major) problem right now is that the minimax algorithm runs painfully slow. I'm not quite sure why that's the case, but I imagine that's to do with the inefficiencies in constructing and copying multiple instances of an object repetitively. That is what I have to work on right now.
 
+(Turns out I made a pretty studpi mistake of calling `pygame.init()` every single time I initialised a new board during the minimax algorithm!)
+
 ## Sep 15, 2020 Somewhat decent AI
 
 I have previously watched a tutorial on implementing AI for a connect4 game, which uses a decision rule called the "minimax algorithm" for determining the best move. There's quite a bit of math and game theory related stuff involved, but in short, it is based on a weighted score-based system such that it maximises the player's own gains and minimises its losses; this is iteratively applied to consecutive moves for both the player and its opponent. For more details, check out the [wikipedia page](https://en.wikipedia.org/wiki/Minimax) (check out the psuedocode as well!). I wondered how well this would be for reversi/ orthello, so without looking into other orthello projects, I went straight to implementation after watching the connect4 AI tutorial.

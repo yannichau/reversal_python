@@ -454,8 +454,6 @@ def score_position(board, turn):
 	# corner_count_opp = corners.count(opp_turn)
 	score = score + corner_count*100 # - corner_count_opp*100
 
-	return score
-
 	# Number of flipped pieces for the given move (just for a small offset)
 	# score += flip_num
 
@@ -473,6 +471,8 @@ def score_position(board, turn):
 	score = score - next_corner_count*200 - next_border_count*20
 
 	# Consider if own position is immediately flipped afterwards?
+
+	return score
 
 # Picks the best move based on the current board only.
 def pick_best_move(board, available_board, turn):
