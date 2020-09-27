@@ -425,14 +425,13 @@ class Reversal:
         pygame.time.wait(2500)
 
     # Goes to next turn.
-    def next_player(self, error):
-        if error == False:
-            if self.turn == 1:
-                self.turn = 2
-                self.next_turn = 1
-            else:
-                self.turn = 1
-                self.next_turn = 2
+    def next_player(self):
+        if self.turn == 1:
+            self.turn = 2
+            self.next_turn = 1
+        else:
+            self.turn = 1
+            self.next_turn = 2
 
     # Designate scores for positions available on the board (which is the temporary board where the test piece is inserted)
     def score_position(self, turn):
@@ -494,3 +493,48 @@ class Reversal:
                 best_loc = best_row, best_col
         return best_loc
 
+# Minimax Algorithm for finding the the best move
+def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
+
+    temp = Reversal()
+    temp.board = board.copy()
+    valid_locations = temp.availoc(turn)
+
+    if depth == 0 or len(valid_locations)== 0: # not useful to know the terminal node of the game
+        return (None, None, temp.score_position(AI))
+
+    if maximizingPlayer:
+        value = -math.inf
+        best_row, best_col = random.choice(valid_locations)
+        for loc in valid_locations:
+            row, col = loc
+            temp_new = Reversal()
+            temp_new.board = temp.board.copy()
+            dummy = temp_new.orthello(row, col, AI, True)
+            new_score = minimax(temp_new.board, depth-1, alpha, beta, False, AI)[2]
+            if new_score > value:
+                value = new_score
+                best_row = row
+                best_col = col
+            alpha = max(alpha, value)
+            if alpha >= beta:
+                break
+        return best_row, best_col, value
+
+    else: # Minimizing player
+        value = math.inf
+        best_row, best_col = random.choice(valid_locations)
+        for loc in valid_locations:
+            row, col = loc
+            temp_new = Reversal()
+            temp_new.board = temp.board.copy()
+            dummy = temp_new.orthello(row, col, PLAYER, True)
+            new_score = minimax(temp_new.board, depth-1, alpha, beta, True, PLAYER)[2]
+            if new_score < value:
+                value = new_score
+                best_row = row
+                best_col = col
+            beta = min(beta, value)
+            if alpha >= beta:
+                break
+        return best_row, best_col, value
