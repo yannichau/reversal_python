@@ -446,7 +446,7 @@ def score_position(board, turn):
 	# Number of flipped pieces for the given move (just for a small offset)
 	# score += flip_num
 
-""" 	# Advantage points of opponent in next move
+	# Advantage points of opponent in next move
 	next_board = board.copy()
 	next_avaiboard = np.zeros((DIM,DIM))
 	next_availist = availoc(next_board, next_avaiboard, opp_turn)
@@ -459,7 +459,7 @@ def score_position(board, turn):
 	next_border_count = next_left_array.count(opp_turn) + next_right_array.count(opp_turn) + next_top_array.count(opp_turn) + next_bott_array.count(opp_turn)
 	score = score - next_corner_count*200 - next_border_count*20
 
-	# Consider if own position is immediately flipped afterwards? """
+	# Consider if own position is immediately flipped afterwards?
 
 	
 
@@ -540,7 +540,7 @@ AI_valid = False
 # pygame variables
 pygame.init()
 screen = pygame.display.set_mode(size)
-myfont = pygame.font.SysFont("calibri",40)
+myfont = pygame.font.SysFont("calibri",30)
 
 ##### First Blit #####
 
