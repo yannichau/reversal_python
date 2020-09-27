@@ -484,7 +484,7 @@ def pick_best_move(board, available_board, turn):
 		temp_board = board.copy()
 		temp_avaiboard = available_board.copy()
 		flip_num = orthello(temp_board, best_row, best_col, turn, True) 
-		score = score_position(temp_board, turn, flip_num)
+		score = score_position(temp_board, turn)
 		if score > best_score:
 			best_score = score
 			best_loc = best_row, best_col

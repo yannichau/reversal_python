@@ -2,6 +2,7 @@
 
 - [Conventions](#conventions)
 - [Logs](#logs)
+  - [Sep 27, 2020 Refactor game into an OOP (Object oriented programming) version](#sep-27-2020-refactor-game-into-an-oop-object-oriented-programming-version)
   - [Sep 15, 2020 Somewhat decent AI](#sep-15-2020-somewhat-decent-ai)
   - [Sep 14, 2020 Created log](#sep-14-2020-created-log)
   - [Sep 13, 2020 Implement dumb AI](#sep-13-2020-implement-dumb-ai)
@@ -24,6 +25,21 @@ This is a log of the the development of my reversal/ orthello game. I created th
 - The board is represented by a numpy array of dimension 8x8. For instance, (3,4) refers to the location at the 4th row, in the 5th column.
 
 # Logs
+
+## Sep 27, 2020 Refactor game into an OOP (Object oriented programming) version
+
+A few days ago I read about a package called `py2app` that allows you to create standalone applications with python, which would allow me to conveniently distribute the game as a desktop app. That sounds very neat indeed and I imagine that in the very near future would come in handy.
+
+However, before I create this deliverable, I kind of want to make sure that the player can access both the player-to-player mode as well as the player-to-AI mode within a single package. Currently, all development has went into the AI version, which means that all the methods written within the player-to-player version are outdated.
+
+Going forward, it is in my best interest to seperate my functions into a seperate file that are accessible by multiple game modes, hence object oriented programming. There are also other subtle differences, like the players are "PLAYER vs AI" rather than "Player 1 vs Player 2". I've slightly updated the file structure:
+
+- [reversal_helpers.py](reversal_helpers.py) now holds all the methods necessary for the game, in a class unimaginatively called Reversal.
+- [reversal_ai.py](reversal_ai.py) is written to use these methods.
+- [reversal_ai_nonOOP.py](reversal_ai_nonOOP.py) is the previous version of the game, which does not involve OOP.
+- I will update [reversal_gui_mac.py](reversal_gui_mac.py) and [reversal.py](reversal.py) later on.
+
+One minor (major) problem right now is that the minimax algorithm runs painfully slow. I'm not quite sure why that's the case, but I imagine that's to do with the inefficiencies in constructing and copying multiple instances of an object repetitively. That is what I have to work on right now.
 
 ## Sep 15, 2020 Somewhat decent AI
 
