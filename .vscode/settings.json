@@ -4,6 +4,6 @@
     "python.linting.pylintEnabled": true,
     "python.linting.pylintArgs":[
         "--extension-pkg-whitelist=pygame",
-        "--erros-only"
+        "--errors-only"
   ]
 }
