@@ -39,6 +39,7 @@ stats_line1_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*3)
 stats_line2_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*3.5)
 stats_line3_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4)
 stats_line4_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4.5)
+message_centre = (SQUARE_SIZE, SQUARE_SIZE*int((DIM+2)/2))
 
 ################################## TEMPORARY VARIABLES #####################################
 p1_score = 0
@@ -333,13 +334,25 @@ def print_board(board, flip_num): #
 	# plt.imshow(board, cmap='hot', interpolation='nearest')
 	# plt.show()
 
-# End game (True if all entries are filled in)
+# End game boolean (True if all entries are filled in)
 def is_end_game(board):
 	for c in range(DIM):
 		for r in range(DIM): 
 			if board[r][c] == 0:
 				return False
 	return True
+
+# End game
+def terminate_game(board):
+	p1_score = np.count_nonzero(board==1)
+	p2_score = np.count_nonzero(board==2)
+	print("End Game. Who wins?")
+	if (p2_score > p1_score):
+		print_special_message(board, available_board, turn, "AI wins!")
+	elif (p2_score == p1_score):
+		print_special_message(board, available_board, turn, "It's a tie! You're both winners/ losers!")
+	else:
+		print_special_message(board, available_board, turn, "PLAYER wins!")
 
 # Draw Board (Graphics)
 def draw_board(board):
@@ -403,7 +416,7 @@ def print_special_message(board, available_board, turn, message):
 	screen.blit(wood_img, (0,0))
 	# draw_avaiBoard(available_board, turn)
 	# draw_board(board)
-	screen.blit(label, (20,500))
+	screen.blit(label, message_centre)
 	pygame.display.update()
 	print_statistics(board, turn)
 	pygame.time.wait(2500)
@@ -460,8 +473,6 @@ def score_position(board, turn):
 	score = score - next_corner_count*200 - next_border_count*20
 
 	# Consider if own position is immediately flipped afterwards?
-
-	
 
 # Picks the best move based on the current board only.
 def pick_best_move(board, available_board, turn):
@@ -634,14 +645,8 @@ while not game_over:
 		# Check for end game
 		p1_score = np.count_nonzero(board==1)
 		p2_score = np.count_nonzero(board==2)
-		if is_end_game(board) or cant_move > 2:
-			print("End Game. Who wins?")
-			if (p2_score > p1_score):
-				print_special_message(board, available_board, turn, "AI wins!")
-			elif (p2_score == p1_score):
-				print_special_message(board, available_board, turn, "It's a tie! You're both winners/ losers!")
-			else:
-				print_special_message(board, available_board, turn, "PLAYER wins!")
+		if is_end_game(board):
+			terminate_game(board)
 			game_over = True
 
 		# Next move
@@ -658,8 +663,6 @@ while not game_over:
 	else: # If either player cannot move, then move on to next player. Blit available locations for next player.
 		cant_move += 1
 		print_special_message(board, available_board, turn, (f"Can't Move! Player {turn} cannot move. It is player {next_turn}'s turn." % locals()))
-		draw_avaiBoard(available_board, turn)
-		draw_board(board)
 		if turn == PLAYER:
 			turn = AI
 			next_turn = PLAYER
@@ -667,4 +670,9 @@ while not game_over:
 			turn = PLAYER
 			next_turn = AI
 		playable_list = availoc(board, available_board, turn)
+		draw_avaiBoard(available_board, turn)
+		draw_board(board)
+		if cant_move > 2:
+			terminate_game(board)
+			game_over = True
 
