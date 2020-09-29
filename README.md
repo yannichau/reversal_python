@@ -7,10 +7,13 @@
 - [1. Quick Start](#1-quick-start)
   - [1.1. Error Messages](#11-error-messages)
   - [1.2. Packages required](#12-packages-required)
-- [2. Functions/ Methods](#2-functions-methods)
-  - [2.1. Basic Operations of the game](#21-basic-operations-of-the-game)
-  - [2.2. Methods for the AI version](#22-methods-for-the-ai-version)
-  - [2.3. Debugging, Blitting on Pygame window](#23-debugging-blitting-on-pygame-window)
+- [2. Documentation - The Reversal and Reversal_AI classes](#2-documentation---the-reversal-and-reversal_ai-classes)
+  - [2.1. Members](#21-members)
+  - [2.2. Methods and functions](#22-methods-and-functions)
+    - [2.2.1. Methods for the Reversal Class](#221-methods-for-the-reversal-class)
+    - [2.2.2. Additional methods for the Reversal_AI Class](#222-additional-methods-for-the-reversal_ai-class)
+    - [2.2.3. Debugging, Blitting on Pygame window](#223-debugging-blitting-on-pygame-window)
+    - [2.2.4. Others](#224-others)
 - [3. Plans for the future](#3-plans-for-the-future)
 - [4. A brief collection of things I have read (at the moment)](#4-a-brief-collection-of-things-i-have-read-at-the-moment)
 
@@ -70,65 +73,91 @@ In addition, special messages are displayed when appropriate. The special messag
 
 This assumes that you have python3 installed (as well as jupyter notebook installed if you would like to run the notebook).
 
-# 2. Functions/ Methods
+# 2. Documentation - The Reversal and Reversal_AI classes
 
-Here's the list of methods for this game, sorted in relevant categories.
+Here's the list of members and methods for this game, sorted in relevant categories.
 
-## 2.1. Basic Operations of the game
+## 2.1. Members
 
-1. `create_board()`  
-Initialises an empty board (a numpy array) with 4 pieces in the centre.
+Each instance of a `Reversal` or `Reversal_AI` class includes the folllowing members:
 
-2. `can_play(board, piece)`  
+- `board`: a numpy array of the dimensions specified, used the hold the pieces
+- `available_board`: similar to board, but holds the moves available for the next player
+- `flip_num`: the number of pieces flipped on the board in the previous move.
+- `turn` and `next_turn`: pretty self explanatory
+
+Possible members to add(?):
+
+- `history`: a list of boards in the past to record all the moves made, so that one can possibly revert to a previous move (no backsies?)
+- `playable_list`: if I'm recording the number of flipped pieces, I might as well save the moves available to the player as well.
+
+One thing I should note is that I still take turn as an argument for most methods, as some of the methods may need to be called for different players. For example, if a player makes and invalid move, we need to blit the available moves for the current player rather than the next player.
+
+## 2.2. Methods and functions
+
+### 2.2.1. Methods for the Reversal Class
+
+1. `initialise(self, turn):`  
+Initialises an empty board (a numpy array) with 4 pieces in the centre, as well as hollow circles for the moves available for the first player (which is randomised).
+
+2. `is_vacant(self, row, col, piece):`  
+Boolean true if location selected by player is vacant.
+
+3. `def can_play(self, piece)`  
 Determines whether or not the user can place a piece, by performing `is_reversible()` on all vacant spots on the board. (In some cases a player may be inhibited to do so since there is no available spot where a reversal can occur.) This function is no longer used, and is instead replaced by detecting the length of the list of available moves (determined with the function `availoc()`).
 
-3. `orthello(board, row, col, piece, drop)` 
+4. `def availoc(self, piece):`  
+Returns a list of available locations for a player, and drops the available move pieces to the `available_board`.
+
+5. `def orthello(self, row, col, piece, drop):` 
 This grand function performs two things:
     1. With the drop boolean set to false, it determines whether the placement of piece will lead to reversals.
     2. With the drop boolean set to true, it actually drops the piece at the desired location, and reverse all the relevant pieces surounding it. This involves finding nearest piece (with opponent in between) in the vertical/hoirzontal/diagonal axis and reversing the pieces. This also returns an integer, which is the number of reversals.
 
-4. `is_end_game(board)`  
+6. `def is_end_game(self):`  
 Boolean true if all entries on the board are non-zero (so basically the board is full).
 
-5. `is_vacant(board, row, col, piece)`  
-Boolean true if location selected by player is vacant.
+7. `def terminate_game(self):`  
+Prints the winning/ tie message at the end.
 
-8. `create_avaiBoard()`  
-Initialises another board, which is used for displaying moves (locations) available to the player. At the beginning it is initialised with the moves available to player 1, which are (3,5) (5,3) (2,4) or (4,2).
+8. `def next_player(self):`  
+Sets the `turn` and `next_turn` members of the class to the next move.
 
-9. `availoc(board, available_board, piece)`  
-Returns a list of available locations for a player, and drops the available move pieces to the `available_board`.
+### 2.2.2. Additional methods for the Reversal_AI Class
 
-## 2.2. Methods for the AI version
-
-10. `score_position(board, turn, flip_num)`  
+9. `def score_position(self, turn):`  
 Assigns a score for the location specified. Things taken into consideration are advantage points (borders and corners) as well as number of flipped pieces, though the flipped number plays a much smaller role that the aforementioned advantage points (it's just there to add a small offset). It also considers advantage points of the opponent in the next turn. I suspect this may be slightly messing the minimax algorithm, though the somewhat arbitrary nature of the scores may play a role as well.
 
-11. `pick_best_move(board, available_board, turn)`  
+10. `def pick_best_move(self, turn):`  
 [No longer used] It is  used for testing `score-position()`, so it just selects the best location based on scores on the current board only.
 
-12. `minimax(board, depth, alpha, beta, maximizingPlayer, new_row, new_col)`  
-This is where the minimax algorithm is implemented, so it recursively calls itself, and calls on `score_position()` when the depth reaches zero. One thing is I don't consider the terminal nodes mentioned in the psuedocode - I'm not quite sure how winning moves applies to a game like Orthello.
+11. `minimax(board, depth, alpha, beta, maximizingPlayer, new_row, new_col)`  
+This static method is where the minimax algorithm is implemented, so it recursively calls itself, and calls on `score_position()` when the depth reaches zero. One thing is I don't consider the terminal nodes mentioned in the psuedocode - I'm not quite sure how winning moves applies to a game like Orthello.
 
-## 2.3. Debugging, Blitting on Pygame window
+### 2.2.3. Debugging, Blitting on Pygame window
 
-13.  `print_board(board, flip_num)`  
+12. `def print_board(self, flip_num):`  
 Prints the board (an array in the terminal, as well as a 'heat map' in a jupyter notebook, for better visibility), the total number of pieces on the board, the number of pieces for each player, and the number of flips (reversals) performed.
 
-14. `draw_board(board)`  
+13. `def draw_board(self):`  
 Draws the actual board on the GUI pygame window.
 
-15.  `draw_avaiBoard(available_board, turn)`  
+14. `def draw_avaiBoard(self, turn):`  
 Displays the available moves available for a player, shown as a hollow circle of the player's color on the pygame window.
 
-16. `print_special_message(message)`  
-Prints error messages on the top, above the player and statistics.
+15. `def print_special_message(self, message):`  
+Prints error messages on the top, above the player and statistics. Ovverride available for the AI version.
 
-17. `print_statistics(board, turn)`  
-Blits relevant statistics on the panel to the right.
+16. `def print_statistics(self):`  
+Blits relevant statistics on the panel to the right. Ovverride available for the AI version.
 
-18.  `insert(row, col, piece)`  
+17. `def insert(row, col, piece):`  
 A function specifically designed for the jupyter workbook, which performs `drop_piece()` and `print_board()`. Note that the notebook does not actually perform verification steps such as `can_play()`, `is_vacant()`, `is_reversible()`.
+
+### 2.2.4. Others
+
+18. `def within_range(pos):`  
+Quick function to determine whether the x/y position of the cursor is located within the board.
 
 # 3. Plans for the future
 
@@ -140,3 +169,4 @@ A function specifically designed for the jupyter workbook, which performs `drop_
 
 1. https://github.com/KeithGalli/Connect4-Python
 2. https://www.youtube.com/playlist?list=PLFCB5Dp81iNV_inzM-R9AKkZZlePCZdtV
+3. https://dhconnelly.com/paip-python/docs/paip/othello.html

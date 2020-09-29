@@ -2,6 +2,7 @@
 
 - [Conventions](#conventions)
 - [Logs](#logs)
+  - [Sep 29, 2020 Use helper functions for player-to-plaeyr version](#sep-29-2020-use-helper-functions-for-player-to-plaeyr-version)
   - [Sep 27, 2020 Refactor game into an OOP (Object oriented programming) version](#sep-27-2020-refactor-game-into-an-oop-object-oriented-programming-version)
   - [Sep 15, 2020 Somewhat decent AI](#sep-15-2020-somewhat-decent-ai)
   - [Sep 14, 2020 Created log](#sep-14-2020-created-log)
@@ -25,6 +26,10 @@ This is a log of the the development of my reversal/ orthello game. I created th
 - The board is represented by a numpy array of dimension 8x8. For instance, (3,4) refers to the location at the 4th row, in the 5th column.
 
 # Logs
+
+## Sep 29, 2020 Use helper functions for player-to-plaeyr version
+
+Now both the player-to-player and player-to-AI version of the game utilises the same `Reversal` class (and the inherited `Reversal_AI` class), which means that they utilise the same members and methods. This would allow for more streamlined development. It has also alloed me to move some flags into the object itself, thus reducing the comoplexity and length of the main files.
 
 ## Sep 27, 2020 Refactor game into an OOP (Object oriented programming) version
 
