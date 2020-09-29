@@ -10,6 +10,8 @@ import random
 DIM = 8
 PLAYER = 1
 AI = 2
+PLAYER_1 = 1
+PLAYER_2 = 2
 EMPTY = 0
 
 # Colors
@@ -56,7 +58,6 @@ class Reversal:
         self.board = np.zeros((DIM, DIM))
         self.available_board = np.zeros((DIM, DIM))
 
-
     # Should be run at the start of the game.
     def initialise(self, turn):
         pygame.init()
@@ -81,7 +82,6 @@ class Reversal:
             self.available_board[3][2] = 2
             self.available_board[5][4] = 2
             self.available_board[4][5] = 2  
-
 
     # Function to check if location is vacant.
     def is_vacant(self, row, col, piece):
@@ -398,9 +398,9 @@ class Reversal:
         pygame.draw.rect(self.screen, GRAY, (stats_box_top_left, stats_box_dim))
         pygame.draw.rect(self.screen, BLACK, (stats_box_top_left, stats_box_dim), 1)
         if self.turn == 2:
-            player_label = self.myfont.render(("AI"), 1, BLACK)
+            player_label = self.myfont.render(("Player 2"), 1, BLACK)
         elif self.turn == 1:
-            player_label = self.myfont.render(("PLAYER"), 1, WHITE)
+            player_label = self.myfont.render(("Player 1"), 1, WHITE)
         self.screen.blit(player_label, player_centre)
         p1_score = np.count_nonzero(self.board == 1)
         p2_score = np.count_nonzero(self.board == 2)
@@ -433,6 +433,8 @@ class Reversal:
             self.turn = 1
             self.next_turn = 2
 
+class Reversal_AI(Reversal):
+    
     # Designate scores for positions available on the board (which is the temporary board where the test piece is inserted)
     def score_position(self, turn):
         score = 0
@@ -470,7 +472,7 @@ class Reversal:
         next_top_array = [next_board.available_board[0][i] for i in range(1, DIM-1)]
         next_bott_array = [next_board.available_board[DIM-1][i] for i in range(1, DIM-1)]
         next_border_count = next_left_array.count(opp_turn) + next_right_array.count(opp_turn) + next_top_array.count(opp_turn) + next_bott_array.count(opp_turn)
-        score = score - next_corner_count*200 - next_border_count*20
+        score = score - next_corner_count*500 - next_border_count*50
 
         # Consider if own position is immediately flipped afterwards?
 
@@ -483,7 +485,7 @@ class Reversal:
         best_row, best_col = random.choice(valid_locations) # initialise with random location.
         for loc in valid_locations:
             best_row, best_col = loc
-            temp = Reversal()
+            temp = Reversal_AI()
             temp.board = self.board.copy()
             temp.available_board = self.available_board.copy()
             flip_num = temp.orthello(best_row, best_col, turn, True) 
@@ -493,10 +495,43 @@ class Reversal:
                 best_loc = best_row, best_col
         return best_loc
 
+    # Blit player and statistics information
+    def print_statistics(self):
+        pygame.draw.rect(self.screen, GRAY, (stats_box_top_left, stats_box_dim))
+        pygame.draw.rect(self.screen, BLACK, (stats_box_top_left, stats_box_dim), 1)
+        if self.turn == 2:
+            player_label = self.myfont.render(("AI"), 1, BLACK)
+        elif self.turn == 1:
+            player_label = self.myfont.render(("PLAYER"), 1, WHITE)
+        self.screen.blit(player_label, player_centre)
+        p1_score = np.count_nonzero(self.board == 1)
+        p2_score = np.count_nonzero(self.board == 2)
+        total_label = self.myfont.render((f"Total = {np.count_nonzero(self.board)}"), 1, WHITE)
+        score1_label = self.myfont.render((f"PLAYER = {p1_score}"), 1, WHITE)
+        score2_label = self.myfont.render((f"AI = {p2_score}"), 1, BLACK)
+        flip_label = self.myfont.render((f"Flipped = {self.flip_num}"), 1, WHITE)
+        self.screen.blit(total_label, stats_line1_centre)
+        self.screen.blit(score1_label, stats_line2_centre)
+        self.screen.blit(score2_label, stats_line3_centre)
+        self.screen.blit(flip_label, stats_line4_centre)
+        pygame.display.update()
+
+    # Blit special error messages or win game messages on the top.
+    def print_special_message(self, message):
+        print(message)
+        message = message.replace("Player 1", "PLAYER")
+        message = message.replace("player 2", "AI")
+        label = self.myfont.render(message, 1, WHITE)
+        self.screen.blit(wood_img, (0, 0))
+        self.screen.blit(label, message_centre)
+        pygame.display.update()
+        self.print_statistics()
+        pygame.time.wait(2500)
+
 # Minimax Algorithm for finding the the best move
 def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
 
-    temp = Reversal()
+    temp = Reversal_AI()
     temp.board = board.copy()
     valid_locations = temp.availoc(turn)
 
@@ -538,3 +573,8 @@ def minimax(board, depth, alpha, beta, maximizingPlayer, turn):
             if alpha >= beta:
                 break
         return best_row, best_col, value
+
+def within_range(pos):
+    if SQUARE_SIZE < pos < SQUARE_SIZE*(DIM+1):
+        return True
+    return False

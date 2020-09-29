@@ -441,7 +441,6 @@ while not game_over:
 
     # Reinitialise Flags
     error = False
-
     print_statistics(board, turn)
 
     if len(playable_list) != 0:
