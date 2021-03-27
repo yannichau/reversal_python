@@ -44,7 +44,7 @@ stats_line4_centre = (int((DIM+2)*SQUARE_SIZE+SQUARE_SIZE/2), SQUARE_SIZE*4.5)
 message_centre = (SQUARE_SIZE, SQUARE_SIZE*int((DIM+2)/2))
 
 ################################## TEMPORARY VARIABLES #####################################
-wood_img = pygame.image.load('media/light_wood.jpg')
+wood_img = pygame.image.load('light_wood.jpg')
 
 ##################################### CLASS ##########################################
 """
@@ -405,8 +405,8 @@ class Reversal:
         p1_score = np.count_nonzero(self.board == 1)
         p2_score = np.count_nonzero(self.board == 2)
         total_label = self.myfont.render((f"Total = {np.count_nonzero(self.board)}"), 1, WHITE)
-        score1_label = self.myfont.render((f"PLAYER = {p1_score}"), 1, WHITE)
-        score2_label = self.myfont.render((f"AI = {p2_score}"), 1, BLACK)
+        score1_label = self.myfont.render((f"Player 1 = {p1_score}"), 1, WHITE)
+        score2_label = self.myfont.render((f"Player 2 = {p2_score}"), 1, BLACK)
         flip_label = self.myfont.render((f"Flipped = {self.flip_num}"), 1, WHITE)
         self.screen.blit(total_label, stats_line1_centre)
         self.screen.blit(score1_label, stats_line2_centre)
@@ -495,7 +495,7 @@ class Reversal_AI(Reversal):
                 best_loc = best_row, best_col
         return best_loc
 
-    # Blit player and statistics information
+    # Blit player and statistics information (override)
     def print_statistics(self):
         pygame.draw.rect(self.screen, GRAY, (stats_box_top_left, stats_box_dim))
         pygame.draw.rect(self.screen, BLACK, (stats_box_top_left, stats_box_dim), 1)
@@ -516,10 +516,11 @@ class Reversal_AI(Reversal):
         self.screen.blit(flip_label, stats_line4_centre)
         pygame.display.update()
 
-    # Blit special error messages or win game messages on the top.
+    # Blit special error messages or win game messages on the top. (override)
     def print_special_message(self, message):
         print(message)
         message = message.replace("Player 1", "PLAYER")
+        message = message.replace("Player 2", "AI")
         message = message.replace("player 2", "AI")
         label = self.myfont.render(message, 1, WHITE)
         self.screen.blit(wood_img, (0, 0))

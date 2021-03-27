@@ -93,7 +93,6 @@ while not game_over:
             game.draw_avaiBoard(game.next_turn)
             game.print_board(flip_num)
             game.draw_board()
-
         # Draw board and move on to next step
         
         if (game.turn == PLAYER and player_valid == True) or (game.turn == AI and AI_valid == True):            
